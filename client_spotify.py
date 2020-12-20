@@ -1,7 +1,8 @@
-### ADD CLIENT_SECRET FIELD ###
+### ADD CLIENT_SECRET FIELD FROM GOOGLE DOC ###
 
 import requests
 import json
+import csv
 
 # spotify developer account credentials ->  Google Docs
 
@@ -55,6 +56,47 @@ def genres_to_csv(csv_file):
 
 
 
+### INCOMPLETE ###
+
+def get_artist_id(artist_name, track_name):
+    pass
+
+def genres_to_csv(csv_directory):
+    with open(csv_directory) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter = ',')
+        line_count = 1
+        
+        for row in csv_reader:
+            for i in row:
+                print(i)
+
+            if line_count == 21:
+                break
+            
+            line_count += 1
+            print()
+            
+# replace whitespaces by %20
+def get_query_string(string):
+    return '%20'.join(string.split(' '))
+
+### --- ###
+
+
+# Tests
+track_name = "Last Dance - Radio Edit"
+artists = ["['Avicii']"]
+
+# genres_to_csv("./names_classified_sorted-clusters.csv")
+
+query = "?q=" + get_query_string(track_name)
+result = requests.get(BASE_URL + 'search' + query, headers = headers).json()
+
+print(get_query_string("The Last Dancer"))
+
+
+
+"""
 # tests
 id = '1gij27s31tFKcTHa8f1u4g'
 x = get_track_data(id)
@@ -63,3 +105,4 @@ print_json(x)
 cp_id = '4gzpq5DPGxSnKTe4SA8HAU'
 y = get_artist_data(cp_id)
 print_json(y)
+"""
