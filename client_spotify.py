@@ -45,6 +45,13 @@ def get_artist_genre(x):
 def print_json(x):
     print(json.dumps(x, indent=4))
 
+# WILL IMPLEMENT
+def get_artist_id(artist_name):
+    pass
+
+def genres_to_csv(csv_file):
+    pass
+
 
 
 
