@@ -1,4 +1,7 @@
+### ADD CLIENT_SECRET FIELD ###
+
 import requests
+import json
 
 # spotify developer account credentials ->  Google Docs
 
@@ -30,7 +33,26 @@ BASE_URL = 'https://api.spotify.com/v1/'
 
 
 def get_track_data(track_id):
-    return requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
+    return requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers).json()
 
 def get_artist_data(artist_id):
-    return requests.get(BASE_URL + 'artists/' + artist_id, headers = headers)
+    return requests.get(BASE_URL + 'artists/' + artist_id, headers = headers).json()
+
+# returns a list of genres associated with artist
+def get_artist_genre(x):
+    return get_artist_data(x)['genres']
+
+def print_json(x):
+    print(json.dumps(x, indent=4))
+
+
+
+
+# tests
+id = '1gij27s31tFKcTHa8f1u4g'
+x = get_track_data(id)
+print_json(x)
+
+cp_id = '4gzpq5DPGxSnKTe4SA8HAU'
+y = get_artist_data(cp_id)
+print_json(y)
