@@ -31,3 +31,6 @@ BASE_URL = 'https://api.spotify.com/v1/'
 
 def get_track_data(track_id):
     return requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
+
+def get_artist_data(artist_id):
+    return requests.get(BASE_URL + 'artists/' + artist_id, headers = headers)
