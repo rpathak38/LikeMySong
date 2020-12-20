@@ -20,3 +20,14 @@ auth_response_data = auth_response.json()
 # save the access token
 access_token = auth_response_data['access_token']
 
+# Request header
+headers = {
+    'Authorization': 'Bearer {token}'.format(token=access_token)
+}
+
+# base URL of all spotify endpoints
+BASE_URL = 'https://api.spotify.com/v1/'
+
+
+def get_track_data(track_id):
+    return requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
