@@ -40,8 +40,8 @@ def get_artist_data(artist_id):
     return requests.get(BASE_URL + 'artists/' + artist_id, headers = headers).json()
 
 # returns a list of genres associated with artist
-def get_artist_genre(x):
-    return get_artist_data(x)['genres']
+def get_artist_genre(artist_id):
+    return get_artist_data(artist_id)['genres']
 
 def print_json(x):
     print(json.dumps(x, indent=4))
@@ -88,13 +88,22 @@ track_name = "Last Dance - Radio Edit"
 artists = ["['Avicii']"]
 
 # genres_to_csv("./names_classified_sorted-clusters.csv")
-
-query = "?q=" + get_query_string(track_name)
+type = 'track'
+limit = 1
+query = "?q=" + get_query_string(track_name) + '&type=' + type + '&limit=' + str(limit)
 result = requests.get(BASE_URL + 'search' + query, headers = headers).json()
+artist_obj = result['tracks']['items'][0]['artists'][0]  ## may be multiple artists. Will need to iterate over list in that case.
 
-print(get_query_string("The Last Dancer"))
+artist_id = artist_obj['id'] 
+artist_name = artist_obj['name']
+artist_genres = get_artist_genre(artist_id)
+
+print("id: ", artist_id)
+print("name: ", artist_name)
+print("genres: ", artist_genres)
 
 
+#print(get_query_string("The Last Dancer"))
 
 """
 # tests
