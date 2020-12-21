@@ -1,31 +1,39 @@
 from flask import Flask, render_template, url_for, flash, redirect
 from forms import RegistrationForm, LoginForm
+import mysql.connector, csv
+import pandas as pd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
-posts = [
-    {
-        'author': 'Person One',
-        'title': 'Blog Post 1',
-        'content': 'First post content',
-        'date_posted': 'December 20, 2020'
-    },
-    {
-        'author': 'Person Two',
-        'title': 'Blog Post 2',
-        'content': 'Second post content',
-        'date_posted': 'December 21, 2020'
-    }
-]
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="music123",
+    database="musicdb"
+)
 
+mycursor = mydb.cursor()
 
 @app.route("/")
-@app.route("/home")
+@app.route("/home", methods = ['POST']
 def home():
+    #didn't really touch the other code yet, but this is the db implementation
+    #the input will be assigned to user_song_id and for now, i returned a
+    #list of the song ids in song_rec_ids
+    #any other querying/ranking can be done from this point
+    user_song_id = '5dl96yjlEqgrZ74QwQqqYW'
+    mycursor.execute("SELECT cluster FROM ml_results WHERE id=%s", (user_song_id,))
+    cluster = mycursor.fetchall()[0][0]
+    mycursor.execute("SELECT id FROM ml_results WHERE cluster=%s", (cluster,))
+    result = mycursor.fetchall()
+    song_rec_ids = []
+    for item in result:
+        song_rec_ids.append(item[0])
+    song_rec_ids.remove(user_song_id)
+    
     return render_template('home.html', posts=posts)
-
-
+    
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
