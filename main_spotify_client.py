@@ -239,7 +239,7 @@ class SpotifyAPI(object):
 
 #instantiate Spotify API client object
 client_id = 'bbd7a9b053844b45b1bbe801383e8b2b' # '' = your client_id
-client_secret = 'd359982a557a44208b92a963fb40660e' # '' = your client_secret
+client_secret = '' # '' = your client_secret
 spotify = SpotifyAPI(client_id, client_secret)
 
 spotify.write_to_csv("./data.csv", "data_with_genres", version="v2")
