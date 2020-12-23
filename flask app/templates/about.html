@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>About Page</h1>
+    <form action = "http://localhost:5000/about" method = "post">
+       <p>Search</p>
+       <p><input type = "text" name = "nm" /></p>
+       <p><input type = "submit" value = "submit" /></p>
+    </form>
+{% endblock content %}
