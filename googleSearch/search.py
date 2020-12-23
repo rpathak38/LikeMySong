@@ -23,3 +23,5 @@ def google_search(google_query):
     id5 = [thing.replace("https://open.spotify.com/track/", "") for thing in searches]
     if len(id5) == 0:
         raise SongNotFound(query=google_query)
+    else:
+        return id5
