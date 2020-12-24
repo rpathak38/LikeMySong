@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, flash, redirect, request
+from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
 from forms import RegistrationForm, LoginForm
 import mysql.connector, csv
 import pandas as pd
@@ -7,9 +7,12 @@ from googlesearch import search
 import search_google
 from pickles import pickles
 import numpy as np
+import json
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+CORS(app)
 
 mydb = mysql.connector.connect(
     host="localhost",
@@ -69,15 +72,15 @@ def home():
             data[rec] = 'https://open.spotify.com/track/' + spotify.get_track_specific_data(id, 'uri')[14:]
 
         print(data)
-        
-        
+
+
     return render_template('home.html')
 
 @app.route("/about", methods=['GET', 'POST'])
 def about():
-    if request.method == 'POST':
-        user = request.form['nm']
-
+    user = request.get_json()
+    print(user)
+    if user:
         try:
             id5 = search_google.google_search(user)
             data = []
@@ -87,13 +90,19 @@ def about():
                 artists = []
                 for artist_id in artist_ids:
                     artists.append(spotify.get_artist_specific_data(artist_id))
-                data.append((spotify.get_track_specific_data(id), artists, id))
+                temp_data = {}
+                temp_data["name"] = spotify.get_track_specific_data(id)
+                temp_data["artist"] = artists
+                temp_data["id"] = id
+                data.append(temp_data)
+            x = json.dumps(data)
+            return x
 
-            print(data)
         except search_google.SongNotFound as e:
-            print(e.message)
+            return e.message
 
-    return render_template('about.html', title='About')
+    return {}
+
 
 
 @app.route("/register", methods=['GET', 'POST'])
