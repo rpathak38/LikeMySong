@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Abel&display=swap");
+
+.body {
+  height: 100vh;
+  background-color: #212121;
+  color: #1db954;
+}
+
+.center {
+  text-align: center;
+  width: 50vw;
+  margin: auto;
+}
+
+.logo {
+  margin: 25% 0;
+  display: inline-block;
+  border: 7px solid #1db954;
+  font-family: "Source Code Pro", monospace;
+}

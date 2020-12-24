@@ -1,0 +1,19 @@
+.search {
+    width: 100%;
+    font-family: "Abel", sans-serif;
+    font-style: italic;
+    /* background: rgb(29, 185, 84);
+    background: radial-gradient(
+      circle,
+      rgba(29, 185, 84, 1) 0%,
+      rgba(10, 107, 43, 1) 100%
+    ); */
+    border: none;
+    height: 3vh;
+    padding-left: 10px;
+  }
+  
+  .search:focus {
+    border: none;
+  }
+  

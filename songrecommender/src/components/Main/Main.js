@@ -1,22 +1,19 @@
 import React, { Component } from "react";
+import NavBar from "../NavBar/NavBar";
+import "./Main.css";
+import Search from "../Search/Search";
 
 class Main extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <NavBar />
+        <div className="body">
+          <div className="center">
+            <h1 className="logo">LIKEMYSONG</h1>
+            <Search />
+          </div>
+        </div>
       </div>
     );
   }
