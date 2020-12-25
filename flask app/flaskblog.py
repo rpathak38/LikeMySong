@@ -59,6 +59,7 @@ def home():
         mycursor.execute("SELECT id FROM ml_results WHERE cluster=%s", (cluster,))
         result = mycursor.fetchall()
         #TODO explicit used as a filter, defaults to non-explicit
+
         song_rec_ids = []
         for item in result:
             song_rec_ids.append(item[0])
@@ -78,9 +79,12 @@ def home():
 
 @app.route("/about", methods=['GET', 'POST'])
 def about():
-    user = request.get_json()
-    print(user)
-    if user:
+    if request.method == 'POST':
+        user = request.form['nm']
+        print("REQUEST")
+        print(request)
+        print("USER")
+        print(user)
         try:
             id5 = search_google.google_search(user)
             data = []
@@ -96,12 +100,13 @@ def about():
                 temp_data["id"] = id
                 data.append(temp_data)
             x = json.dumps(data)
+            print(x)
             return x
 
         except search_google.SongNotFound as e:
             return e.message
 
-    return {}
+    return render_template('about.html')
 
 
 
