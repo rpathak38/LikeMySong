@@ -26,8 +26,7 @@ def genre_filter(songs: List[Song], target: Song, genre_dict: dict) -> List[Song
     """
 
     songs_out = []
-
-    def _ranker(possible_song):
+    for possible_song in songs:
         possible_song.genres = [genre_dict.get(genre) for genre in possible_song.genres if
                                 genre_dict.get(genre) is not None]
         possible_song.similarity = 0
@@ -36,10 +35,8 @@ def genre_filter(songs: List[Song], target: Song, genre_dict: dict) -> List[Song
         if possible_song.similarity > 0:
             songs_out.append(possible_song)
 
-    results = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(_ranker)(i) for i in songs)
-
-    if songs_out == 0:
+    if len(songs_out) == 0:
         return songs
     else:
-        ranked_songs = results.sort(key=lambda song: song.similarity, reverse=True)
+        ranked_songs = songs_out.sort(key=lambda song: song.similarity, reverse=True)
         return ranked_songs
