@@ -263,7 +263,7 @@ class SpotifyAPI(object):
             writer.writeheader()
             writer.writerows(master_data_with_genres)
 
-    def specialized_get_all_user_playlists_track_data(self, user_id="thesoundsofspotify", debug=False):
+    def specialized_get_all_user_playlists_track_data(self, user_id="thesoundsofspotify"):
         
         playlist_ids = self.specialized_all_playlist_ids_from_user_id(self, user_id)
         # each item in data has key: value of playlist_id: all_tracks_data_from_playlist
