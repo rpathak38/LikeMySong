@@ -11,9 +11,9 @@ import csv
 
 from requests.api import head
 
-
+#Spotify API Client Object (SAPICO) definition
+# Spotify API Developer Reference: https://developer.spotify.com/documentation/web-api/reference/
 class SpotifyAPI(object):
-    
     access_token = None
     access_token_expires = datetime.datetime.now()
     access_token_did_expire = True
@@ -96,7 +96,34 @@ class SpotifyAPI(object):
         if r.status_code not in range(200, 299):
             return {}
         return r.json()
-    
+
+    def get_genre_seeds(self, version='v1', resource_type='recommendations', lookup_id='available-genre-seeds'):
+        endpoint = f"https://api.spotify.com/{version}/{resource_type}/{lookup_id}"
+        headers = self.get_resource_header()
+        r = requests.get(endpoint, headers=headers)
+        if r.status_code not in range(200, 299):
+            return {}
+        return r.json()
+
+    def get_genre_properties(self, genre, version='v1', resource_type='recommendations'):
+        endpoint = f"https://api.spotify.com/{version}/{resource_type}?seed_genres={genre}"
+        headers = self.get_resource_header()
+        r = requests.get(endpoint, headers=headers)
+        if r.status_code not in range(200, 299):
+            return {}
+        return r.json()
+
+    def get_playlists_data(self, _id):
+      return self.get_resource(_id, resource_type='playlists')
+
+    def get_user_playlists_data(self, _id):
+        endpoint = f"https://api.spotify.com/v1/users/{_id}/playlists"
+        headers = self.get_resource_header()
+        r = requests.get(endpoint, headers=headers)
+        if r.status_code not in range(200, 299):
+            return {}
+        return r.json() 
+
 #Accessed Spotify Endpoint: albums (https://developer.spotify.com/documentation/web-api/reference/albums/)
     
     def get_album_data(self, _id):
@@ -183,8 +210,8 @@ class SpotifyAPI(object):
     def specialized_compile_unique_genres(self, genres_master_arr=[], track_id=''):
         artists_genre_arr = self.specialized_distinct_artists_genres_from_track_id(track_id)
         for x in range(0, len(artists_genre_arr)):
-            if (artists_genre_arr[x] not in genres_master_arr):
-                genres_master_arr.append(artists_genre_arr[x])
+          if (artists_genre_arr[x] not in genres_master_arr):
+            genres_master_arr.append(artists_genre_arr[x])
 
     def specialized_compile_track_ids_from_training_set(self):
         genres_master_arr = []
@@ -202,7 +229,6 @@ class SpotifyAPI(object):
                 x.append(str(next(music_reader)[8]))
         for item in range(0, len(x)):
             self.specialized_compile_unique_genres(genres_master_arr = genres_master_arr, track_id=x[item])
-        
         return genres_master_arr
 
     def write_to_csv(self, read_from_file_csv, write_to_file_csv_name, num_rows=10, version="v1"):
@@ -237,9 +263,81 @@ class SpotifyAPI(object):
             writer.writeheader()
             writer.writerows(master_data_with_genres)
 
+    def specialized_get_all_user_playlists_track_data(self, user_id="thesoundsofspotify", debug=False):
+        
+        playlist_ids = self.specialized_all_playlist_ids_from_user_id(self, user_id)
+        # each item in data has key: value of playlist_id: all_tracks_data_from_playlist
+        data = dict(zip(playlist_ids, map(self.specialized_all_tracks_data_from_playlist, playlist_ids)))
+        return data
+        
+    def specialized_all_playlist_ids_from_user_id(self, user_id="thesoundsofspotify", debug=False):
+        """
+        Helper method.
+        The total number of playlists in thesoundofspotify's data is ~5400. The get_user_playlists_data function 
+        returns data in chunks of 20. 
+        This iterates over all ~270 chunks using the 'next' field. A similar thing is done for retrieving tracks as they are 
+        also returned in chunks of 100.
+        This retrieves all playlists.
+        """
+
+        user_playlists_data = self.get_user_playlists_data(user_id)
+        playlist_ids = []
+
+        # get all playlist ids of the user and append to playlist_ids
+        while True:     # emulates a do-while loop
+            for index in range(len(user_playlists_data['items'])):
+                playlist_ids.append(user_playlists_data['items'][index]['id'])
+
+            if user_playlists_data['next'] != None:
+                if debug:
+                    print(user_playlists_data['next'])
+                user_playlists_data = requests.get(user_playlists_data['next'], headers = spotify.get_resource_header()).json()
+            else:
+                break
+
+        return playlist_ids   
+
+
+    def specialized_all_tracks_data_from_playlist(self, playlist_id):
+        """
+        Helper method. 
+        Gets complete track_data from playlist_id and returns the result as a list of dicts. 
+        Each dict is one record.
+        """     
+        playlist_data = self.get_playlists_data(playlist_id)
+        track_ids = []
+        playlist_track_audio_features_with_genres = []
+
+        # get all track_ids from a playlist and append to track_ids
+        while True:     # emulates a do-while loop
+            for i in range(len(playlist_data['tracks']['items'])):
+                track_id = playlist_data['tracks']['items'][i]['track']['id']
+                track_ids.append(track_id)
+
+            if playlist_data['tracks']['next'] != None:
+                print(playlist_data['tracks']['next'])
+                playlist_data['tracks'] = requests.get(playlist_data['tracks']['next'], headers = self.get_resource_header()).json()
+            
+            else:
+                break
+
+        # now for each track_id, append audio features along with artist genres as one record (as a dict) to playlist_track_audio_features_with_genres
+        for track_id in track_ids:
+            track_audio_features = self.get_track_audio_features(track_id)
+            
+            try:    # doesn't work without this try-except block. Haven't figured out why yet. Throws a KeyError for 'genres' somewhere up the call stack otherwise.
+                artists_genres = self.specialized_distinct_artists_genres_from_track_id(track_id)
+            except:
+                pass
+            
+            track_audio_features['artists_genres'] = artists_genres
+            playlist_track_audio_features_with_genres.append(track_audio_features)
+        
+        return playlist_track_audio_features_with_genres
+
 #instantiate Spotify API client object
 client_id = 'bbd7a9b053844b45b1bbe801383e8b2b' # '' = your client_id
 client_secret = '' # '' = your client_secret
 spotify = SpotifyAPI(client_id, client_secret)
 
-spotify.write_to_csv("./data.csv", "data_with_genres", version="v2")
+# spotify.write_to_csv("./data.csv", "data_with_genres", version="v2")
